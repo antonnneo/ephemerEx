@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: antonnneo
+      changes:
+        - sqlFile:
+            path: create_table_messages.sql

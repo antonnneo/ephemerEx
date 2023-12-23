@@ -9,17 +9,46 @@ services:
     ports:
       - "5000:5000"
     networks:
-      - ephemerex
+      - ephnet
 
   db:
     image: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "user"]
+      timeout: 5s
+      retries: 10
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DATABASE: postgres
     networks:
-      - ephemerex
+      - ephnet
+
+  liquibase:
+    image: liquibase/liquibase:4.5.0
+    volumes:
+      - ./app/liquibase:/liquibase/changelog
+    working_dir: /liquibase/changelog
+    command:
+      [
+        "liquibase",
+        "--driver=org.postgresql.Driver",
+        "--url=jdbc:postgresql://db:5432/postgres",
+        "--changelog-file=changelog.yml",
+        "--username=user",
+        "--password=password",
+        "--logLevel=warning",
+        "--headless=true",
+        "update"
+      ]
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - ephnet
 
 networks:
-  ephemerex:
-    driver: host
+  ephnet:
+    driver: bridge
