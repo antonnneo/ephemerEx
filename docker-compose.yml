@@ -1,9 +1,25 @@
-version: '3.1'
+version: '3.8'
 
 services:
+
+  app:
+    build:
+      context: app
+      dockerfile: dockerfile.ephemerex
+    ports:
+      - "5000:5000"
+    networks:
+      - ephemerex
+
   db:
     image: postgres
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DATABASE: postgres
+    networks:
+      - ephemerex
+
+networks:
+  ephemerex:
+    driver: host
