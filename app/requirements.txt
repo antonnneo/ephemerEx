@@ -1,3 +1,4 @@
 flask==3.0.0
-psycopg-binary==3.1.16
 psycopg==3.1.16
+uvicorn==0.25.0
+fastapi==0.105.0

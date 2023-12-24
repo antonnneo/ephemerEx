@@ -1,6 +1,7 @@
 from flask import Flask
-from db_interface import execute
-import random
+from modules import execute, generate_text
+from uuid import uuid4
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -14,11 +15,11 @@ def health():
 def new_note():
     execute(f"""
     INSERT INTO messages
-    (id, "content", read_counter, read_limit, created)
-    VALUES('{random.randint(1, 10000000)}', 'test', true, false, 0);
+            ("content")
+    VALUES
+            ('{generate_text(10_000)}');
     """)
-
-    return 'Привет, мир!'
+    return {"message": "Text saved successfully"}
 
 
 if __name__ == '__main__':

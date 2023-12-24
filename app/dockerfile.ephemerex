@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.12
 LABEL maintainer="antonnneo"
 
 WORKDIR /app
@@ -9,4 +9,4 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     pip3 install -r requirements.txt
 
-CMD ["sh", "-c", "python3 /app/start.py"]
+CMD ["sh", "-c", "python3 /app/fasta.py"]
