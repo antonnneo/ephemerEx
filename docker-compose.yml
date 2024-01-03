@@ -25,6 +25,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DATABASE: postgres
     networks:
+
       - ephnet
 
   liquibase:
@@ -53,3 +54,4 @@ services:
 networks:
   ephnet:
     driver: bridge
+    
