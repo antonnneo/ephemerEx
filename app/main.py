@@ -1,18 +1,21 @@
-from fastapi import FastAPI
-import uvicorn
+
 import os
-from modules import execute
+import uvicorn
+
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from modules import execute
+
 
 app = FastAPI()
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
     allow_credentials=True,
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.get("/health")
 def health():
@@ -21,7 +24,6 @@ def health():
         "instanceId": os.environ.get("HOSTNAME"),
         "status": "healthy"
     }
-
 
 @app.post("/new")
 def new_note(contract: dict):
@@ -43,8 +45,6 @@ def new_note(contract: dict):
             "instanceId": os.environ.get("HOSTNAME"),
             "error": "there is no field 'text' in request"
         }
-    
-    
 
 @app.post("/read")
 def new_note(contract: dict):
@@ -71,6 +71,7 @@ def new_note(contract: dict):
             "instanceId": os.environ.get("HOSTNAME"),
             "message": f"{result}"
         }
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
