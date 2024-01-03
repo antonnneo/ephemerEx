@@ -1,1 +1,5 @@
-# bestFileHostingService
+# ephemerEx
+
+Сервис для обмена сообщениями или файлами, уничтожающимися после прочтения или получения.
+
+docker compose up --build
