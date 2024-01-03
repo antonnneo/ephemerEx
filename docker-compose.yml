@@ -5,7 +5,7 @@ services:
   app:
     build:
       context: app
-      dockerfile: dockerfile.ephemerex
+      dockerfile: dockerfile.app
     ports:
       - "5000:5000"
       - "8000:8000"

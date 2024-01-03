@@ -9,4 +9,4 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     pip3 install -r requirements.txt
 
-CMD ["sh", "-c", "python3 /app/fasta.py"]
+CMD ["sh", "-c", "python3 /app/main.py"]

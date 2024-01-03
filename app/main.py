@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 import uvicorn
-from modules import execute, generate_text
-from datetime import datetime
-from uuid import uuid4
+from modules import execute
 
 app = FastAPI()
 
@@ -12,16 +10,18 @@ def health():
 
 
 @app.post("/new/")
-def new_note():
+def new_note(note_data):
+    text = note_data.get("text")
+    print(text)
     result = execute(f"""
     INSERT INTO messages
             ("content")
     VALUES
-            ('{generate_text(10_000)}')
+            ('{text}')
     RETURNING
         id;
     """)
-
+    
     return {"id": f"{result}"}
 
 
