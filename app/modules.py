@@ -1,10 +1,13 @@
 import psycopg
 import random
 import string
-
+import os
 
 def execute(sql_expression):
-    with psycopg.connect("dbname=postgres user=user password=password host=localhost") as conn:
+    with psycopg.connect(f"""host={os.environ.get('POSTGRES_HOST')} 
+                         dbname={os.environ.get('POSTGRES_DBNAME')} 
+                         user={os.environ.get('POSTGRES_USER')} 
+                         password={os.environ.get('POSTGRES_PASSWORD')}""") as conn:
         with conn.cursor() as cur:
             cur.execute(f"{sql_expression}")
             try:
