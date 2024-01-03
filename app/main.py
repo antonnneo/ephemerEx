@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 import uvicorn
+import os
 from modules import execute
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -13,13 +14,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/health/")
+@app.get("/health")
 def health():
     """ just healthcheck """
-    return 'healthy'
+    return {
+        "instanceId": os.environ.get("HOSTNAME"),
+        "status": "healthy"
+    }
 
 
-@app.post("/new/")
+@app.post("/new")
 def new_note(contract: dict):
     """ receive the text of the message and save it to the database
     assign uuid and return it in the response """
@@ -30,13 +34,19 @@ def new_note(contract: dict):
             INSERT INTO messages ("content")
             VALUES ('{text}')
             RETURNING id;""")
-        return {"id": f"{result}"}
+        return {
+            "instanceId": os.environ.get("HOSTNAME"),
+            "id": f"{result}"
+        }
     else:
-        return {"error": "there is no field 'text' in request"}
+        return {
+            "instanceId": os.environ.get("HOSTNAME"),
+            "error": "there is no field 'text' in request"
+        }
     
     
 
-@app.post("/read/")
+@app.post("/read")
 def new_note(contract: dict):
     """ get the UUID of the message
     delete the message with represented UUID and return message's text at response """
@@ -52,9 +62,15 @@ def new_note(contract: dict):
         WHERE id = '{id}';""")
 
     if result is None:
-        return {"error": f"message with id '{id}' not found"}
+        return {
+            "instanceId": os.environ.get("HOSTNAME"),
+            "error": f"message with id '{id}' not found"
+        }
     else:
-        return {"message": f"{result}"}
+        return {
+            "instanceId": os.environ.get("HOSTNAME"),
+            "message": f"{result}"
+        }
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
