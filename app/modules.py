@@ -4,10 +4,13 @@ import string
 
 
 def execute(sql_expression):
-    with psycopg.connect("dbname=postgres user=user password=password host=db") as conn:
+    with psycopg.connect("dbname=postgres user=user password=password host=localhost") as conn:
         with conn.cursor() as cur:
             cur.execute(f"{sql_expression}")
-            return cur.fetchone()[0]
+            try:
+                return cur.fetchone()[0]
+            except:
+                pass
 
 def generate_text(length):
     all_characters = string.ascii_letters + string.digits

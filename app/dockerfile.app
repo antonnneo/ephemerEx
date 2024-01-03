@@ -1,4 +1,4 @@
-FROM python:3.12
+FROM python:3.10
 LABEL maintainer="antonnneo"
 
 WORKDIR /app
