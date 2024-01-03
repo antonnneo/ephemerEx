@@ -12,8 +12,10 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     ports:
-      - "5000:5000"
       - "8000:8000"
+    depends_on:
+      liquibase:
+        condition: service_completed_successfully
     networks:
       - ephnet
 
@@ -52,6 +54,17 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - ephnet
+
+  swagger:
+    image: swaggerapi/swagger-ui
+    ports:
+      - 8080:8080
+    volumes:
+      - ./openapi.yml:/usr/share/nginx/html/openapi.yml
+    environment:
+      - API_URL=/openapi.yml
     networks:
       - ephnet
 
