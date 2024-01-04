@@ -9,13 +9,13 @@ servers:
 
 
 paths:
-  /health/:
+  /health:
     get:
       summary: Healthcheck
       responses:
         '200':
           description: OK
-  /new/:
+  /new:
     post:
       summary: Create a new note
       requestBody:
@@ -42,7 +42,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /read/:
+  /read:
     post:
       summary: Read a note
       requestBody:
