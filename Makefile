@@ -11,3 +11,4 @@ up:: ## Run services
 down:: ## Stop services
 	docker compose down
 	docker system prune -af
+	
