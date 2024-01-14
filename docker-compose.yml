@@ -2,7 +2,22 @@ version: '3.8'
 
 services:
 
-  app:
+  nginx:
+    image: nginx:1.25.3-perl
+    ports:
+      - 80:80
+    depends_on:
+      app1:
+        condition: service_healthy
+      app2:
+        condition: service_healthy
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - ephnet
+
+
+  app1:
     build:
       context: app
       dockerfile: dockerfile.app
@@ -11,6 +26,11 @@ services:
       POSTGRES_DBNAME: postgres
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
     ports:
       - "8000:8000"
     depends_on:
@@ -19,8 +39,32 @@ services:
     networks:
       - ephnet
 
+
+  app2:
+    build:
+      context: app
+      dockerfile: dockerfile.app
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_DBNAME: postgres
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    ports:
+      - "8001:8000"
+    depends_on:
+      liquibase:
+        condition: service_completed_successfully
+    networks:
+      - ephnet
+
+
   db:
-    image: postgres
+    image: postgres:16
     ports:
       - "5432:5432"
     healthcheck:
@@ -33,6 +77,7 @@ services:
       POSTGRES_DATABASE: postgres
     networks:
       - ephnet
+
 
   liquibase:
     image: liquibase/liquibase:4.5.0
@@ -57,16 +102,23 @@ services:
     networks:
       - ephnet
 
+
   swagger:
-    image: swaggerapi/swagger-ui
+    image: swaggerapi/swagger-ui:v5.11.0
     ports:
       - 8080:8080
     volumes:
       - ./openapi.yml:/usr/share/nginx/html/openapi.yml
     environment:
       - API_URL=/openapi.yml
+    depends_on:
+      app1:
+        condition: service_healthy
+      app2:
+        condition: service_healthy
     networks:
       - ephnet
+
 
 networks:
   ephnet:
