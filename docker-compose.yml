@@ -3,7 +3,7 @@ version: '3.8'
 services:
 
   nginx:
-    image: nginx:1.25.3-perl
+    image: nginx:1.25.3-bookworm-perl
     ports:
       - 80:80
     depends_on:
