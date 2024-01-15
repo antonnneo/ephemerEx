@@ -47,7 +47,7 @@ def new_note(contract: dict):
         }
 
 @app.post("/read")
-def new_note(contract: dict):
+def read_note(contract: dict):
     """ get the UUID of the message
     delete the message with represented UUID and return message's text at response """
 
