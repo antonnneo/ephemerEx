@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from modules import execute
+from modules import Response
 
 
 app = FastAPI()
@@ -20,10 +21,13 @@ app.add_middleware(
 @app.get("/health")
 def health():
     """ just healthcheck """
-    return {
-        "instanceId": os.environ.get("HOSTNAME"),
-        "status": "healthy"
-    }
+    response = Response
+
+    response.instanceId
+    response.status(status="healthy")
+
+    return response.struct
+
 
 @app.post("/new")
 def new_note(contract: dict):
