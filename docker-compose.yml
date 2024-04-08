@@ -23,7 +23,8 @@ services:
       dockerfile: dockerfile.app
     environment:
       POSTGRES_HOST: db
-      POSTGRES_DBNAME: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DBNAME: ephemerex
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     healthcheck:
@@ -46,7 +47,8 @@ services:
       dockerfile: dockerfile.app
     environment:
       POSTGRES_HOST: db
-      POSTGRES_DBNAME: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DBNAME: ephemerex
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     healthcheck:
@@ -72,9 +74,9 @@ services:
       timeout: 5s
       retries: 10
     environment:
+      POSTGRES_DB: ephemerex
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DATABASE: postgres
     networks:
       - ephnet
 
@@ -88,7 +90,7 @@ services:
       [
         "liquibase",
         "--driver=org.postgresql.Driver",
-        "--url=jdbc:postgresql://db:5432/postgres",
+        "--url=jdbc:postgresql://db:5432/ephemerex",
         "--changelog-file=changelog.yml",
         "--username=user",
         "--password=password",

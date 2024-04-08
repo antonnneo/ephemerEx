@@ -1,13 +1,17 @@
-import os
 import uvicorn
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from modules import execute
-from modules import Response
+from interfaces.api_contracts.health.response import HealthResponse
+from interfaces.api_contracts.new.request import NewRequest
+from interfaces.api_contracts.new.response import NewResponse
+from interfaces.api_contracts.read.request import ReadRequest
+from interfaces.api_contracts.read.response import ReadResponse
+from interfaces.database import DataBase
 
 
+db = DataBase()
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -20,62 +24,28 @@ app.add_middleware(
 
 @app.get("/health")
 def health():
-    """ just healthcheck """
-    response = Response
-
-    response.instanceId
-    response.status(status="healthy")
-
-    return response.struct
+    """ healthcheck """
+    return HealthResponse()
 
 
 @app.post("/new")
-def new_note(contract: dict):
-    """ receive the text of the message and save it to the database
-    assign uuid and return it in the response """
+def new(data: dict):
+    """ receive text, save it to db and return uuid of entry """
+    data = NewRequest.init_from_dict(data)
 
-    text = contract.get("text")
-    if text is not None:
-        result = execute(f"""
-            INSERT INTO messages ("content")
-            VALUES ('{text}')
-            RETURNING id;""")
-        return {
-            "instanceId": os.environ.get("HOSTNAME"),
-            "id": f"{result}"
-        }
-    else:
-        return {
-            "instanceId": os.environ.get("HOSTNAME"),
-            "error": "there is no field 'text' in request"
-        }
+    return NewResponse(message_id=db.insert(data.message_text))
+
 
 @app.post("/read")
-def read_note(contract: dict):
-    """ get the UUID of the message
-    delete the message with represented UUID and return message's text at response """
+def read(data: dict):
+    """ get message's UUID, delete it from db and return text """
+    data = ReadRequest.init_from_dict(data)
 
-    id = contract.get("id")
-    result = execute(f"""
-        SELECT "content" 
-        FROM messages
-        where id = '{id}';""")
+    message_text = db.select(data.message_id)
+    db.delete(data.message_id)
 
-    execute(f"""
-        DELETE FROM messages
-        WHERE id = '{id}';""")
-
-    if result is None:
-        return {
-            "instanceId": os.environ.get("HOSTNAME"),
-            "error": f"message with id '{id}' not found"
-        }
-    else:
-        return {
-            "instanceId": os.environ.get("HOSTNAME"),
-            "message": f"{result}"
-        }
+    return ReadResponse(message_text=message_text)
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="localhost", port=8000)
