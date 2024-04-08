@@ -11,84 +11,66 @@ servers:
 paths:
   /health:
     get:
-      summary: Healthcheck
+      description: Возвращает статус здоровья приложения
       responses:
         '200':
-          description: OK
-
-
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  instance_id:
+                    type: string
+          
   /new:
     post:
-      summary: Create a new note
+      description: Создает новое сообщение
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                text:
+                message_text:
                   type: string
-              required:
-                - text
       responses:
         '200':
-          description: OK
+          description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NoteResponse'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-
+                type: object
+                properties:
+                  message_id:
+                    type: string
+                  error:
+                    type: null
+                  instance_id:
+                    type: string
+          
   /read:
     post:
-      summary: Read a note
+      description: Возвращает текст сообщения по его идентификатору
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                id:
+                message_id:
                   type: string
-              required:
-                - id
       responses:
         '200':
-          description: OK
+          description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageResponse'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-
-components:
-  schemas:
-    NoteResponse:
-      type: object
-      properties:
-        id:
-          type: string
-    MessageResponse:
-      type: object
-      properties:
-        message:
-          type: string
-    ErrorResponse:
-      type: object
-      properties:
-        error:
-          type: string
+                type: object
+                properties:
+                  message_text:
+                    type: string
+                  error:
+                    type: null
+                  instance_id:
+                    type: string
