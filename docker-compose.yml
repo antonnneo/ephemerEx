@@ -20,7 +20,7 @@ services:
       context: app
       dockerfile: dockerfile.app
     deploy:
-      replicas: 5
+      replicas: 3
     environment:
       POSTGRES_HOST: db
       POSTGRES_PORT: 5432
@@ -33,7 +33,7 @@ services:
       timeout: 3s
       retries: 3
     ports:
-      - "8000-8004:8000"
+      - "8000-8002:8000"
     depends_on:
       liquibase:
         condition: service_completed_successfully

@@ -2,6 +2,10 @@
 
 # -------------------- ephemerEx --------------------
 
+.PHONY: reqs
+reqs:: ## Install requirements
+	python3.12 -m pip install -r ./app/requirements.txt
+
 .PHONY: up
 up:: ## Run services
 	docker compose version
