@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Секретные сообщения</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        input, button {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+        }
+        input {
+            background-color: #f4f4f4;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        p {
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Секретные сообщения</h1>
+
+        <h2>Отправить секретное сообщение</h2>
+        <input type="text" id="message-text-input" placeholder="Введите текст сообщения">
+        <button onclick="sendMessage()">Отправить</button>
+        <p id="message-id"></p>
+
+        <h2>Прочитать секретное сообщение по ID (самоуничтожится после прочтения)</h2>
+        <input type="text" id="message-id-input" placeholder="Введите ID сообщения">
+        <button onclick="getMessage()">Прочесть</button>
+        <p id="message-output"></p>
+    </div>
+
+    <script>
+        let sendMessageInProgress = false;
+
+        async function sendMessage() {
+            if (sendMessageInProgress) return;
+            sendMessageInProgress = true;
+
+            const messageTextInput = document.getElementById('message-text-input');
+            const messageText = messageTextInput.value;
+
+            try {
+                const response = await axios.post('http://localhost:80/new', { message_text: messageText });
+                const messageId = response.data.message_id;
+                document.getElementById('message-id').textContent = `ID вашего сообщения: ${messageId}`;
+            } catch (error) {
+                console.error('Ошибка при отправке сообщения:', error);
+            } finally {
+                sendMessageInProgress = false;
+            }
+        }
+    </script>
+
+    <script>
+        let getMessageInProgress = false;
+
+        async function getMessage() {
+            if (getMessageInProgress) return;
+            getMessageInProgress = true;
+
+            const messageIdInput = document.getElementById('message-id-input');
+            const messageId = messageIdInput.value;
+
+            try {
+                const response = await axios.post('http://localhost:80/read', { message_id: messageId });
+                const messageText = response.data.message_text;
+                document.getElementById('message-output').textContent = `Секретное сообщение: ${messageText}`;
+            } catch (error) {
+                console.error('Ошибка при получении сообщения:', error);
+            } finally {
+                getMessageInProgress = false;
+            }
+        }
+
+    </script>
+
+</body>
+</html>

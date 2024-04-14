@@ -101,6 +101,18 @@ services:
     networks:
       - ephnet
 
+  
+  front:
+    build:
+      context: ./front
+      dockerfile: dockerfile.front
+    ports:
+      - 1000:80
+    depends_on:
+      nginx:
+        condition: service_healthy
+    networks:
+      - ephnet
 
 networks:
   ephnet:
