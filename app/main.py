@@ -1,3 +1,4 @@
+"""Описание маршрутов и их внутренней логики в представлении FastAPI."""
 import uvicorn
 
 from fastapi import FastAPI
@@ -24,27 +25,31 @@ app.add_middleware(
 
 @app.get("/health")
 def health():
-    """ healthcheck """
+    """Хелсчек-метод, показывает hostname текущего инстанса."""
     return HealthResponse()
 
 
 @app.post("/new")
 def new(data: dict):
-    """ receive text, save it to db and return uuid of entry """
+    """Получает секретноее сообщение, сохраняет в базе, отдает uuid записи."""
     data = NewRequest.init_from_dict(data)
 
-    return NewResponse(message_id=db.insert(data.message_text))
+    message_text_to_insert = data.message_text
+    saved_message_uuid = db.insert(message_text_to_insert)
+
+    return NewResponse(message_id=saved_message_uuid)
 
 
 @app.post("/read")
 def read(data: dict):
-    """ get message's UUID, delete it from db and return text """
+    """Получает uuid секретного сообщения, находит его в базе, удаляет, вернув текст сообщения."""
     data = ReadRequest.init_from_dict(data)
 
-    message_text = db.select(data.message_id)
-    db.delete(data.message_id)
+    uuid_to_read = data.message_id
+    extracted_text = db.select(uuid_to_read)
+    db.delete(uuid_to_read)
 
-    return ReadResponse(message_text=message_text)
+    return ReadResponse(message_text=extracted_text)
 
 
 if __name__ == "__main__":
