@@ -30,26 +30,38 @@ def health():
 
 
 @app.post("/new")
-def new(data: dict):
+def new(request_body: dict):
     """Получает секретноее сообщение, сохраняет в базе, отдает uuid записи."""
-    data = NewRequest.init_from_dict(data)
+    request_body = NewRequest.init_from_dict(request_body)
+    response_body = NewResponse()
 
-    message_text_to_insert = data.message_text
-    saved_message_uuid = db.insert(message_text_to_insert)
-
-    return NewResponse(message_id=saved_message_uuid)
+    try:
+        message_text_to_insert = request_body.message_text
+        saved_message_uuid = db.insert(message_text_to_insert)
+    except Exception as e:
+        response_body.error = e
+    else:
+        response_body.message_id = saved_message_uuid
+    finally:
+        return response_body
 
 
 @app.post("/read")
-def read(data: dict):
-    """Получает uuid секретного сообщения, находит его в базе, удаляет, вернув текст сообщения."""
-    data = ReadRequest.init_from_dict(data)
+def read(request_body: dict):
+    """Получает uuid секретного сообщения, находит его в базе, удаляет, возвращает текст сообщения."""
+    request_body = ReadRequest.init_from_dict(request_body)
+    response_body = ReadResponse()
 
-    uuid_to_read = data.message_id
-    extracted_text = db.select(uuid_to_read)
-    db.delete(uuid_to_read)
-
-    return ReadResponse(message_text=extracted_text)
+    try:
+        uuid_to_read = request_body.message_id
+        extracted_text = db.select(uuid_to_read)
+        db.delete(uuid_to_read)
+    except Exception as e:
+        response_body.error = e
+    else:
+        response_body.message_text = extracted_text
+    finally:
+        return response_body
 
 
 if __name__ == "__main__":
