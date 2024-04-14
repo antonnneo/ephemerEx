@@ -1,0 +1,24 @@
+@startuml
+
+actor User
+
+participant "Postgres Container" as db
+participant "Liquibase" as liquibase
+participant "Backend Instances" as backend
+participant "Nginx" as nginx
+participant "Swagger" as swagger
+participant "Frontend" as frontend
+
+liquibase -> db: После поднятия базы запускает миграции, создает структуру БД и отключается
+backend -> liquibase: Проверяет состояние Liquibase и если тот отработал успешно, запускается несколько инстансов приложения
+nginx -> backend: После запуска всех приложений стартует балансировщик
+frontend -> nginx: Стартует после успешного запуска балансировщика 
+swagger -> nginx: Стартует после успешного запуска балансировщика для визуального представления контрактов
+User -> frontend: Создает секретное сообщение или отправляет id ранее созданного сообщения, хранящегося в базе
+frontend -> nginx: Фронт обращается к балансировщику для взаимодействия с бэком
+nginx -> backend: Проксирует запрос на бэкенд
+backend <-> db: Бэк записывает или вычитывает секретное сообщение и получает id сообщения или само сообщение
+backend -> frontend: Возвращает id сообщения или само сообщение через балансировщик на фронт
+frontend -> User: Отдает пользователю секретное сообщение или его id
+
+@enduml
