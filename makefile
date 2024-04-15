@@ -9,7 +9,7 @@ reqs:: ## Install requirements
 .PHONY: up
 up:: ## Run services
 	docker compose version
-	docker compose up --build
+	docker compose up -d --build
 
 .PHONY: down
 down:: ## Stop services
