@@ -35,15 +35,15 @@ def new(request_body: dict):
     request_body = NewRequest.init_from_dict(request_body)
     response_body = NewResponse()
 
-    try:
-        message_text_to_insert = request_body.message_text
-        saved_message_uuid = db.insert(message_text_to_insert)
-    except Exception as e:
-        response_body.error = e
-    else:
-        response_body.message_id = saved_message_uuid
-    finally:
-        return response_body
+    with DataBase() as db:
+        try:
+            saved_message_uuid = db.insert(request_body.message_text)
+        except Exception as e:
+            response_body.error = e
+        else:
+            response_body.message_id = saved_message_uuid
+        finally:
+            return response_body
 
 
 @app.post("/read")
@@ -52,16 +52,16 @@ def read(request_body: dict):
     request_body = ReadRequest.init_from_dict(request_body)
     response_body = ReadResponse()
 
-    try:
-        uuid_to_read = request_body.message_id
-        extracted_text = db.select(uuid_to_read)
-        db.delete(uuid_to_read)
-    except Exception as e:
-        response_body.error = e
-    else:
-        response_body.message_text = extracted_text
-    finally:
-        return response_body
+    with DataBase() as db:
+        try:
+            extracted_text = db.select(request_body.message_id)
+            db.delete(request_body.message_id)
+        except Exception as e:
+            response_body.error = e
+        else:
+            response_body.message_text = extracted_text
+        finally:
+            return response_body
 
 
 if __name__ == "__main__":

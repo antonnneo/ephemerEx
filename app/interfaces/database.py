@@ -20,6 +20,14 @@ class DataBase():
                                             """)
         self.__cursor = self.__connection.cursor()
 
+    def __enter__(self):
+        """Позволяет использовать класс в контекстном менеджере."""
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Автоматически закрывает соединение при выходе из контекстного менеджера."""
+        self.close()
+
     def insert(self, text):
         message_id = self.__cursor.execute(f"""INSERT INTO public.messages ("content") VALUES ('{text}') RETURNING id;""").fetchone()[0]
         self.__connection.commit()
@@ -31,3 +39,10 @@ class DataBase():
     def delete(self, id):
         self.__cursor.execute(f"""DELETE FROM messages WHERE id = '{id}';""")
         self.__connection.commit()    
+
+    def close(self):
+        """Закрывает курсор и соединение с базой данных."""
+        if self.__cursor:
+            self.__cursor.close()
+        if self.__connection:
+            self.__connection.close()
