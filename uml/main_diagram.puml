@@ -2,23 +2,50 @@
 
 actor User
 
-participant "Postgres Container" as db
-participant "Liquibase" as liquibase
-participant "Backend Instances" as backend
-participant "Nginx" as nginx
-participant "Swagger" as swagger
-participant "Frontend" as frontend
+node "Frontend" as frontend {
+}
 
-liquibase -> db: После поднятия базы запускает миграции, создает структуру БД и отключается
-backend -> liquibase: Проверяет состояние Liquibase и если тот отработал успешно, запускается несколько инстансов приложения
-nginx -> backend: После запуска всех приложений стартует балансировщик
-frontend -> nginx: Стартует после успешного запуска балансировщика 
-swagger -> nginx: Стартует после успешного запуска балансировщика для визуального представления контрактов
-User -> frontend: Создает секретное сообщение или отправляет id ранее созданного сообщения, хранящегося в базе
-frontend -> nginx: Фронт обращается к балансировщику для взаимодействия с бэком
-nginx -> backend: Проксирует запрос на бэкенд
-backend <-> db: Бэк записывает или вычитывает секретное сообщение и получает id сообщения или само сообщение
-backend -> frontend: Возвращает id сообщения или само сообщение через балансировщик на фронт
-frontend -> User: Отдает пользователю секретное сообщение или его id
+node "Nginx (Load Balancer)" as nginx {
+}
+
+node "Backend" as backend {
+    component "Backend Instance 1" as b1
+    component "Backend Instance 2" as b2
+    component "Backend Instance 3" as b3
+}
+
+node "Database" as db {
+    component "Postgres" as postgres
+}
+
+node "Liquibase" as liquibase {
+}
+
+node "Swagger" as swagger {
+}
+
+User -down-> frontend : Interacts with UI
+frontend -down-> nginx : Sends requests
+nginx -down-> backend : Proxies requests to instances
+b1 -right-> postgres : Reads/Writes data
+b2 -right-> postgres : Reads/Writes data
+b3 -right-> postgres : Reads/Writes data
+liquibase -down-> postgres : Runs migrations
+swagger -left-> nginx : Provides API documentation
+
+note right of liquibase
+    Liquibase runs database migrations
+    and shuts down after completion.
+end note
+
+note right of backend
+    Multiple backend instances
+    are started after Liquibase completes.
+end note
+
+note right of nginx
+    Nginx acts as a load balancer,
+    distributing traffic to backend instances.
+end note
 
 @enduml
