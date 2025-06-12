@@ -9,10 +9,10 @@
 make up  
   
 ### Фронтенд:  
-localhost:1000  
+http://localhost:1000/  
   
 ### Swagger:  
-localhost:8080  
-  
+http://localhost:8080/  
+
 ### Потушить контейнеры и полностью зачистить образы:  
 make down  
